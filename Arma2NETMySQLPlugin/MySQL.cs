@@ -67,7 +67,7 @@ namespace Arma2NETMySQLPlugin
                 staleConnectionThread.Start();
             }
 
-            while (connection.State != System.Data.ConnectionState.Open)
+            if (connection.State != System.Data.ConnectionState.Open)
             {
                 try
                 {
@@ -76,8 +76,7 @@ namespace Arma2NETMySQLPlugin
                 }
                 catch (Exception ex)
                 {
-                    Logger.addMessage(Logger.LogType.Info, "Unable to open connection to MySQL database, trying again in 10 seconds." + ex.ToString());
-                    Thread.Sleep(10000);
+                    Logger.addMessage(Logger.LogType.Info, "Unable to open connection to MySQL database." + ex.ToString());
                 }
             }
         }
@@ -183,6 +182,10 @@ namespace Arma2NETMySQLPlugin
                 MySqlCommand command = connection.CreateCommand();
                 command.CommandText = mysql_command;
                 yield return RunOnDatabase(command, maxResultSize);
+            }
+            else
+            {
+                yield return new string[][] { new[] { "Error" } };
             }
             //Logger.addMessage(Logger.LogType.Info, "yield breaking in RunProcedure");
             yield break;
